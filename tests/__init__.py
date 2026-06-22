@@ -1,1 +1,1 @@
-# AnomalyBoost test suite
+"""Test package for AnomalyBoost."""

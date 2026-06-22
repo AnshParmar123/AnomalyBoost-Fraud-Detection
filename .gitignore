@@ -32,9 +32,12 @@ include/
 # Datasets and generated scores (ignore large CSV files)
 *.csv
 !templates/*.csv
+feature_importance.csv
+temp_*.csv
 
 # Models, scalers, and artifacts
 *.h5
+*.keras
 *.joblib
 *.save
 *.json
@@ -45,6 +48,9 @@ include/
 *.png
 *.jpg
 *.jpeg
+
+# Streamlit and notebook state
+.streamlit/
 
 # Testing caches
 .pytest_cache/

@@ -47,7 +47,7 @@ st.markdown("""
         letter-spacing: 0.05em;
     }
 </style>
-""", unsafe_allowed_html=True)
+""", unsafe_allow_html=True)
 
 # Sidebar Information
 st.sidebar.image("https://img.icons8.com/external-flatart-icons-outline-flatarticons/128/external-security-cyber-security-flatart-icons-outline-flatarticons-3.png", width=80)
@@ -62,8 +62,8 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("### Pipeline Controls")
 
 # Header
-st.markdown('<div class="main-title">AnomalyBoost Dashboard</div>', unsafe_allowed_html=True)
-st.markdown('<div class="subtitle">Interactive Credit Card Fraud Detection Pipeline & Visualizations</div>', unsafe_allowed_html=True)
+st.markdown('<div class="main-title">AnomalyBoost Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Interactive Credit Card Fraud Detection Pipeline & Visualizations</div>', unsafe_allow_html=True)
 
 # Try loading metadata.json
 metadata = {}
@@ -100,7 +100,7 @@ with tab_overview:
                 f'<div class="metric-label">XGBoost Test AUC</div>'
                 f'<div class="metric-value">{metrics.get("xgb_test_auc", 0.0):.4f}</div>'
                 f'</div>', 
-                unsafe_allowed_html=True
+                unsafe_allow_html=True
             )
         with col2:
             st.markdown(
@@ -108,7 +108,7 @@ with tab_overview:
                 f'<div class="metric-label">Reconstruction AUC</div>'
                 f'<div class="metric-value">{metrics.get("recon_only_auc", 0.0):.4f}</div>'
                 f'</div>', 
-                unsafe_allowed_html=True
+                unsafe_allow_html=True
             )
         with col3:
             st.markdown(
@@ -116,7 +116,7 @@ with tab_overview:
                 f'<div class="metric-label">Detection F1-Score</div>'
                 f'<div class="metric-value">{metrics.get("xgb_f1", 0.0):.4f}</div>'
                 f'</div>', 
-                unsafe_allowed_html=True
+                unsafe_allow_html=True
             )
         with col4:
             st.markdown(
@@ -124,7 +124,7 @@ with tab_overview:
                 f'<div class="metric-label">Precision / Recall</div>'
                 f'<div class="metric-value">{metrics.get("xgb_precision", 0.0):.2f}/{metrics.get("xgb_recall", 0.0):.2f}</div>'
                 f'</div>', 
-                unsafe_allowed_html=True
+                unsafe_allow_html=True
             )
             
         st.markdown("#### Hyperparameters Used")
@@ -189,7 +189,7 @@ with tab_inference:
                             st.download_button(
                                 label="Download Complete Scored CSV",
                                 data=csv_data,
-                                file_name="scored_predictions.encode.csv",
+                                file_name="scored_predictions.csv",
                                 mime="text/csv"
                             )
                             

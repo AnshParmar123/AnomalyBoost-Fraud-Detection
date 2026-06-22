@@ -4,6 +4,21 @@ from keras import layers, models, ops
 
 logger = logging.getLogger(__name__)
 
+
+class Sampling(layers.Layer):
+    """Reparameterization layer that also registers KL divergence loss."""
+
+    def call(self, inputs):
+        z_mean, z_log_var = inputs
+        batch_size = ops.shape(z_mean)[0]
+        latent_dim = ops.shape(z_mean)[1]
+        epsilon = keras.random.normal(shape=(batch_size, latent_dim), mean=0.0, stddev=1.0)
+        z = z_mean + ops.exp(0.5 * z_log_var) * epsilon
+
+        kl_loss = -0.5 * ops.mean(1.0 + z_log_var - ops.square(z_mean) - ops.exp(z_log_var))
+        self.add_loss(kl_loss)
+        return z
+
 def build_dense_autoencoder(input_dim: int, encoding_dim: int) -> models.Model:
     """Builds a symmetric dense feedforward autoencoder."""
     logger.info(f"Building Dense Autoencoder: input_dim={input_dim}, encoding_dim={encoding_dim}")
@@ -25,7 +40,7 @@ def build_dense_autoencoder(input_dim: int, encoding_dim: int) -> models.Model:
     return model
 
 def build_vae(input_dim: int, latent_dim: int = 16) -> models.Model:
-    """Builds a Variational Autoencoder (VAE) with Gaussian latent distribution using Keras 3 ops."""
+    """Builds a Variational Autoencoder compatible with Keras 3."""
     logger.info(f"Building Variational Autoencoder (VAE): input_dim={input_dim}, latent_dim={latent_dim}")
     
     inputs = layers.Input(shape=(input_dim,), name="vae_input")
@@ -34,14 +49,7 @@ def build_vae(input_dim: int, latent_dim: int = 16) -> models.Model:
     
     z_mean = layers.Dense(latent_dim, name='z_mean')(x)
     z_log_var = layers.Dense(latent_dim, name='z_log_var')(x)
-
-    def sampling(args):
-        z_mean, z_log_var = args
-        batch_size = ops.shape(z_mean)[0]
-        epsilon = keras.random.normal(shape=(batch_size, latent_dim), mean=0.0, stddev=1.0)
-        return z_mean + ops.exp(0.5 * z_log_var) * epsilon
-
-    z = layers.Lambda(sampling, output_shape=(latent_dim,), name='z_sampling')([z_mean, z_log_var])
+    z = Sampling(name='z_sampling')([z_mean, z_log_var])
 
     decoder_h1 = layers.Dense(64, activation='relu', name="vae_dec_dense_1")
     decoder_h2 = layers.Dense(128, activation='relu', name="vae_dec_dense_2")
@@ -52,12 +60,5 @@ def build_vae(input_dim: int, latent_dim: int = 16) -> models.Model:
     x_decoded_mean = decoder_out(h_decoded)
 
     vae = models.Model(inputs, x_decoded_mean, name="Variational_Autoencoder")
-
-    # Custom VAE Loss (Reconstruction Loss + KL Divergence Penalty using Keras 3 ops)
-    recon_loss = ops.mean(ops.square(inputs - x_decoded_mean))
-    kl_loss = -0.5 * ops.mean(1.0 + z_log_var - ops.square(z_mean) - ops.exp(z_log_var))
-    vae_loss = recon_loss + kl_loss
-    
-    vae.add_loss(vae_loss)
-    vae.compile(optimizer='adam')
+    vae.compile(optimizer='adam', loss='mse')
     return vae
